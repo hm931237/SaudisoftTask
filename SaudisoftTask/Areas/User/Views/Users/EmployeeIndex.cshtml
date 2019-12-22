@@ -1,0 +1,54 @@
+﻿
+@{
+    ViewBag.Title = "EmployeeIndex";
+}
+
+<br />
+
+<div class="row">
+    <div class="col-lg-4">
+        <button id="Checkin" class="btn btn-default">Check in</button>
+    </div>
+
+    <div class="col-lg-4">
+        
+        <button id="CheckOut" class="btn btn-default">Check Out</button>
+    </div>
+</div>
+@section Scripts {
+    <script>
+        $("#Checkin").click(function () {
+            toastr.remove();
+            var Id = @Session["UserId"]
+            $.ajax({
+                url: '/Users/CheckIn',
+                data: { UserId: Id },
+                method: "POST",
+                success: function () {
+                    toastr.success("Check In done successfully");
+                },
+                error: function () {
+                    toastr.error("Check In failed");
+                }
+            });
+        });
+    </script>
+
+<script>
+    $("#CheckOut").click(function () {
+        toastr.remove();
+            var Id = @Session["UserId"]
+            $.ajax({
+                url: '/Users/CheckOut',
+                data: { UserId: Id },
+                method: "POST",
+                success: function () {
+                    toastr.success("Check Out done successfully");
+                },
+                error: function () {
+                    toastr.error("Check Out failed");
+                }
+            });
+        });
+</script>
+    }
