@@ -10,6 +10,8 @@ using SaudisoftTask.Areas.UserRole.Models;
 using SaudisoftTask.Models;
 using System.Data.Entity.SqlServer;
 using System.Globalization;
+using PagedList;
+using SaudisoftTask.ViewModels;
 
 namespace SaudisoftTask.Areas.UserRole.Controllers
 {
@@ -224,7 +226,7 @@ namespace SaudisoftTask.Areas.UserRole.Controllers
             }  
         }
         [HttpPost]
-        public ActionResult CheckIn(int UserId)
+        public ActionResult CheckIn(int UserId,string CheckinComment)
         {
             var _Date = DateTime.Now.ToString("yyyy-MM-dd");
             var _userRecord = db.LogedinUsers.SingleOrDefault(U => U.userId == UserId && U.Day == _Date);
@@ -235,7 +237,8 @@ namespace SaudisoftTask.Areas.UserRole.Controllers
                     userId = UserId,
                     Day = _Date,
                     CheckInTime = DateTime.Now.ToString("hh:mm tt"),
-                    CheckOutTime = null
+                    CheckOutTime = null,
+                    CheckInComment= CheckinComment
                 };
                 db.LogedinUsers.Add(_logedinUser);
                 db.SaveChanges();
@@ -248,7 +251,7 @@ namespace SaudisoftTask.Areas.UserRole.Controllers
         }
 
         [HttpPost]
-        public ActionResult CheckOut(int UserId)
+        public ActionResult CheckOut(int UserId,string CheckoutComment)
         {
             var _Date = DateTime.Now.ToString("yyyy-MM-dd");
             var _userRecord = db.LogedinUsers.SingleOrDefault(U => U.userId == UserId && U.Day == _Date && U.CheckOutTime==null);
@@ -259,6 +262,7 @@ namespace SaudisoftTask.Areas.UserRole.Controllers
             else
             {
                 _userRecord.CheckOutTime = DateTime.Now.ToString("hh:mm tt");
+                _userRecord.CheckOutComment = CheckoutComment;
                 db.SaveChanges();
                 return new HttpStatusCodeResult(HttpStatusCode.OK);
             }
@@ -266,46 +270,80 @@ namespace SaudisoftTask.Areas.UserRole.Controllers
         public ActionResult LogOut()
         {
             Session.Clear();
-            Report();
+            //Report();
             return RedirectToAction("Login");
         }
-
+        [HttpGet]
         public ActionResult Report()
         {
+            var UserRole = CheckUser();
+            if (UserRole == 1)
+            {
+                var _reoprtVM = new ReportVM();
+                return View(_reoprtVM);
+            }
+            else
+            {
+                return RedirectToAction("Login");
 
-            var Delay = (from r in db.LogedinUsers
-                        where DbFunctions.CreateTime(SqlFunctions.DatePart("hh", r.CheckInTime),
-                              SqlFunctions.DatePart("mi", r.CheckInTime),
-                              SqlFunctions.DatePart("ss", r.CheckInTime)) > DbFunctions.CreateTime(SqlFunctions.DatePart("hh", r.user.CheckInTime),
-                              SqlFunctions.DatePart("mi", r.user.CheckInTime),
-                              SqlFunctions.DatePart("ss", r.user.CheckInTime))
-                        group r by r.user.Name into g
-                        select new
-                        {
-                            Name = g.Key,
-                            delay = g.Count(),
-                            attendance = 0
-                        }).ToList();
+            }
+        }
+        [HttpPost]
+        public ActionResult Report(ReportVM _report)
+        {
+            
+            var UserRole = CheckUser();
+            if (UserRole == 1&&_report.Report.DateFrom !=null && _report.Report.DateTo != null)
+            {
+                var Delay = (from r in db.LogedinUsers
+                             where DbFunctions.CreateTime(SqlFunctions.DatePart("hh", r.CheckInTime),
+                                   SqlFunctions.DatePart("mi", r.CheckInTime),
+                                   SqlFunctions.DatePart("ss", r.CheckInTime)) > DbFunctions.CreateTime(SqlFunctions.DatePart("hh", r.user.CheckInTime),
+                                   SqlFunctions.DatePart("mi", r.user.CheckInTime),
+                                   SqlFunctions.DatePart("ss", r.user.CheckInTime))
+                             group r by r.user.Name into g
+                             select new
+                             {
+                                 Name = g.Key,
+                                 delay = g.Count(),
+                                 attendance = 0
+                             }).ToList();
 
-            var Attendance= db.LogedinUsers
-              .Select(z => new { z.user.Name, z.Day })
-              .GroupBy(x => new { x.Name })
-              .Select(g => new
-              {
-                  Name = g.Key.Name,
-                  delay = 0,
-                  attendance = g.Count()
-              }).ToList();
+                var Attendance = db.LogedinUsers
+                  .Select(z => new { z.user.Name, z.Day })
+                  .GroupBy(x => new { x.Name })
+                  .Select(g => new
+                  {
+                      Name = g.Key.Name,
+                      delay = 0,
+                      attendance = g.Count()
+                  }).ToList();
 
-            var _total = Delay.Union(Attendance);
+                var _total = Delay.Union(Attendance);
 
-            var _final = _total.Select(e => new { e.Name, e.delay, e.attendance }).GroupBy(e => e.Name).Select(g => new {
-                Name = g.Key,
-                Del = g.Sum(x => x.delay),
-                _Attendance=g.Sum(x=>x.attendance)
-            });
+                var _final = _total.Select(e => new { e.Name, e.delay, e.attendance }).GroupBy(e => e.Name).Select(g => new report
+                {
+                    Name = g.Key,
+                    Del = g.Sum(x => x.delay),
+                    _Attendance = g.Sum(x => x.attendance)
+                }).ToList();
 
-            return View();
+                var ReportVM = new ReportVM
+                {
+                    Reports = _final,
+                };
+                return View(ReportVM);
+            }
+            else if(UserRole == 1&&(_report.Report.DateFrom == null || _report.Report.DateTo == null))
+            {
+                var _reoprtVM = new ReportVM();
+                return View(_reoprtVM);
+            }
+            else
+            {
+                return RedirectToAction("Login");
+            }
+
         }
     }
 }

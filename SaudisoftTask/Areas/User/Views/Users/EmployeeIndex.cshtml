@@ -4,7 +4,14 @@
 }
 
 <br />
-
+<div class="row">
+    <div class="col-lg-4">
+        <label>Comment</label>
+        <div>
+            <input type="text" id="Comment" placeholder="Comment" class="form-control" />
+        </div>
+    </div>
+</div><br />
 <div class="row">
     <div class="col-lg-4">
         <button id="Checkin" class="btn btn-default">Check in</button>
@@ -19,10 +26,11 @@
     <script>
         $("#Checkin").click(function () {
             toastr.remove();
-            var Id = @Session["UserId"]
+            var Id = @Session["UserId"];
+            var Comment=$("#Comment").val();
             $.ajax({
                 url: '/Users/CheckIn',
-                data: { UserId: Id },
+                data: { UserId: Id,CheckinComment: Comment},
                 method: "POST",
                 success: function () {
                     toastr.success("Check In done successfully");
@@ -37,10 +45,11 @@
 <script>
     $("#CheckOut").click(function () {
         toastr.remove();
-            var Id = @Session["UserId"]
+        var Id = @Session["UserId"];
+        var Comment=$("#Comment").val();
             $.ajax({
                 url: '/Users/CheckOut',
-                data: { UserId: Id },
+                data: { UserId: Id,CheckoutComment: Comment },
                 method: "POST",
                 success: function () {
                     toastr.success("Check Out done successfully");
