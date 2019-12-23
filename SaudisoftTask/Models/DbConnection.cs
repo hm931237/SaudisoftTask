@@ -14,6 +14,8 @@ namespace SaudisoftTask.Models
         public virtual DbSet<UserRole> UserRoles { get; set; }
         public virtual DbSet<User> Users { get; set; }
         public virtual DbSet<LogedinUser> LogedinUsers { get; set; }
+        public virtual DbSet<report> Reports { get; set; }
+
 
     }
 }

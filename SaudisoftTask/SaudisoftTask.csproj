@@ -85,6 +85,7 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
+    <Reference Include="Microsoft.ReportViewer.WebForms, Version=12.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL" />
     <Reference Include="PagedList, Version=1.17.0.0, Culture=neutral, PublicKeyToken=abbb863e9397c5e1, processorArchitecture=MSIL">
       <HintPath>..\packages\PagedList.1.17.0.0\lib\net40\PagedList.dll</HintPath>
       <Private>True</Private>
@@ -210,10 +211,23 @@
     <Compile Include="Migrations\201912231803526_FifthMig.Designer.cs">
       <DependentUpon>201912231803526_FifthMig.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201912232001332_sixhMig.cs" />
+    <Compile Include="Migrations\201912232001332_sixhMig.Designer.cs">
+      <DependentUpon>201912232001332_sixhMig.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201912232035517_sixhMig1.cs" />
+    <Compile Include="Migrations\201912232035517_sixhMig1.Designer.cs">
+      <DependentUpon>201912232035517_sixhMig1.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\DbConnection.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ViewModels\ReportVM.cs" />
+    <Compile Include="_SaudisoftTask_Models_DbConnectionDataSet.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>_SaudisoftTask_Models_DbConnectionDataSet.xsd</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\bootstrap.css" />
@@ -277,6 +291,17 @@
     <Content Include="Views\Home\About.cshtml" />
     <Content Include="Views\Home\Contact.cshtml" />
     <Content Include="Views\Home\Index.cshtml" />
+    <Content Include="_SaudisoftTask_Models_DbConnectionDataSet.xsc">
+      <DependentUpon>_SaudisoftTask_Models_DbConnectionDataSet.xsd</DependentUpon>
+    </Content>
+    <None Include="_SaudisoftTask_Models_DbConnectionDataSet.xsd">
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>_SaudisoftTask_Models_DbConnectionDataSet.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </None>
+    <Content Include="_SaudisoftTask_Models_DbConnectionDataSet.xss">
+      <DependentUpon>_SaudisoftTask_Models_DbConnectionDataSet.xsd</DependentUpon>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -284,6 +309,7 @@
     <Folder Include="Areas\LogedinUsers\Views\Shared\" />
     <Folder Include="Areas\UserRole\Controllers\" />
     <Folder Include="Areas\UserRole\Views\Shared\" />
+    <Folder Include="Areas\User\Reports\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff" />
@@ -308,6 +334,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201912231803526_FifthMig.resx">
       <DependentUpon>201912231803526_FifthMig.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201912232001332_sixhMig.resx">
+      <DependentUpon>201912232001332_sixhMig.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201912232035517_sixhMig1.resx">
+      <DependentUpon>201912232035517_sixhMig1.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

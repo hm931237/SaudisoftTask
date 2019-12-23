@@ -39,7 +39,7 @@
                         @Html.DisplayNameFor(model => model.Report.Del)
                     </th>
                     <th style="text-align:center">
-                        @Html.DisplayNameFor(model => model.Report._Attendance)
+                        @Html.DisplayNameFor(model => model.Report.Attendance)
                     </th>
                 </tr>
 
@@ -53,13 +53,13 @@
                             @Html.DisplayFor(modelItem => item.Del)
                         </td>
                         <td style="text-align:center">
-                            @Html.DisplayFor(modelItem => item._Attendance)
+                            @Html.DisplayFor(modelItem => item.Attendance)
                         </td>
                     </tr>
                 }
 
             </table>
-
+            @Html.ActionLink("Export","ExportReport");
         }
 
 @section Scripts {

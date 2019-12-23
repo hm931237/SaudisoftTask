@@ -25,12 +25,13 @@ namespace SaudisoftTask.Areas.UserRole.Models
     }
     public class report
     {
+        public int id { get; set; }
         [Display(Name ="Employee Name")]
         public string Name { get; set; }
         [Display(Name = "Delay")]
         public int Del { get; set; }
         [Display(Name = "Attendance")]
-        public int _Attendance { get; set; }
+        public int Attendance { get; set; }
         [Display(Name = "From Date")]
         [Required]
         public string DateFrom { get; set; }

@@ -12,6 +12,7 @@ using System.Data.Entity.SqlServer;
 using System.Globalization;
 using PagedList;
 using SaudisoftTask.ViewModels;
+using Microsoft.Reporting.WebForms;
 
 namespace SaudisoftTask.Areas.UserRole.Controllers
 {
@@ -325,13 +326,14 @@ namespace SaudisoftTask.Areas.UserRole.Controllers
                 {
                     Name = g.Key,
                     Del = g.Sum(x => x.delay),
-                    _Attendance = g.Sum(x => x.attendance)
+                    Attendance = g.Sum(x => x.attendance)
                 }).ToList();
 
                 var ReportVM = new ReportVM
                 {
                     Reports = _final,
                 };
+                Session["EmpHistory"] = _final;
                 return View(ReportVM);
             }
             else if(UserRole == 1&&(_report.Report.DateFrom == null || _report.Report.DateTo == null))
@@ -344,6 +346,31 @@ namespace SaudisoftTask.Areas.UserRole.Controllers
                 return RedirectToAction("Login");
             }
 
+        }
+
+        public ActionResult ExportReport()
+        {
+            LocalReport _localReport = new LocalReport();
+            _localReport.ReportPath = Server.MapPath("~/Reports/Report1.rdlc");
+            ReportDataSource reportDataSource = new ReportDataSource();
+            reportDataSource.Name = "DataSet1";
+            reportDataSource.Value = Session["EmpHistory"];
+            _localReport.DataSources.Add(reportDataSource);
+            string _reportType = "PDF";
+            string _mimeType;
+            string _encoding;
+            string _fileNameExtintion;
+            if(_reportType == "PDF")
+            {
+                _fileNameExtintion = "pdf";
+            }
+            string[] streams;
+            Warning[] warnings;
+            byte[] renderedByte;
+            renderedByte = _localReport.Render(_reportType,"",out _mimeType,out _encoding,out _fileNameExtintion,out streams,out warnings);
+            Response.AddHeader("content-disposition","attachment:filename= Employee_Report."+_fileNameExtintion);
+            return File(renderedByte, _fileNameExtintion);
+            //return View();
         }
     }
 }
