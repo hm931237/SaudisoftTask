@@ -350,27 +350,26 @@ namespace SaudisoftTask.Areas.UserRole.Controllers
 
         public ActionResult ExportReport()
         {
-            LocalReport _localReport = new LocalReport();
-            _localReport.ReportPath = Server.MapPath("~/Reports/Report1.rdlc");
+            LocalReport localReport = new LocalReport();
+            localReport.ReportPath = Server.MapPath("~/Reports/Report1.rdlc");
             ReportDataSource reportDataSource = new ReportDataSource();
             reportDataSource.Name = "DataSet1";
             reportDataSource.Value = Session["EmpHistory"];
-            _localReport.DataSources.Add(reportDataSource);
-            string _reportType = "PDF";
-            string _mimeType;
-            string _encoding;
-            string _fileNameExtintion;
-            if(_reportType == "PDF")
+            localReport.DataSources.Add(reportDataSource);
+            string reportType = "PDF";
+            string mimeType;
+            string encoding;
+            string fileNameExtintion;
+            if(reportType == "PDF")
             {
-                _fileNameExtintion = "pdf";
+                fileNameExtintion = "pdf";
             }
             string[] streams;
             Warning[] warnings;
             byte[] renderedByte;
-            renderedByte = _localReport.Render(_reportType,"",out _mimeType,out _encoding,out _fileNameExtintion,out streams,out warnings);
-            Response.AddHeader("content-disposition","attachment:filename= Employee_Report."+_fileNameExtintion);
-            return File(renderedByte, _fileNameExtintion);
-            //return View();
+            renderedByte = localReport.Render(reportType,"",out mimeType,out encoding,out fileNameExtintion,out streams,out warnings);
+            Response.AddHeader("content-disposition", "inline; filename= Employee_Report.pdf");
+            return File(renderedByte, "application/pdf");
         }
     }
 }
