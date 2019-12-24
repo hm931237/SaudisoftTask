@@ -224,6 +224,10 @@
     <Compile Include="Migrations\201912232035517_sixhMig1.Designer.cs">
       <DependentUpon>201912232035517_sixhMig1.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201912242011082_DayMigration.cs" />
+    <Compile Include="Migrations\201912242011082_DayMigration.Designer.cs">
+      <DependentUpon>201912242011082_DayMigration.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\DbConnection.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -335,6 +339,9 @@
     <Content Include="Scripts\jquery-1.10.2.min.map" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Migrations\201912242011082_DayMigration.resx">
+      <DependentUpon>201912242011082_DayMigration.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Reports\Report1.rdlc" />
     <EmbeddedResource Include="Migrations\201912201131378_FirstMigration.resx">
       <DependentUpon>201912201131378_FirstMigration.cs</DependentUpon>

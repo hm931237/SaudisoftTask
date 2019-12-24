@@ -12,7 +12,7 @@ namespace SaudisoftTask.Areas.UserRole.Models
         public int ID { get; set; }
         public User user { get; set; }
         public int userId { get; set; }
-        public string Day { get; set; }
+        public DateTime Day { get; set; }
         public string CheckInTime { get; set; }
         public string CheckOutTime { get; set; }
         [Display (Name ="Comment")]

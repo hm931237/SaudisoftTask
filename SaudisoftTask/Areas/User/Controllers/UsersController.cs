@@ -229,49 +229,68 @@ namespace SaudisoftTask.Areas.UserRole.Controllers
         [HttpPost]
         public ActionResult CheckIn(int UserId,string CheckinComment)
         {
-            var _Date = DateTime.Now.ToString("yyyy-MM-dd");
-            var _userRecord = db.LogedinUsers.SingleOrDefault(U => U.userId == UserId && U.Day == _Date);
-            if (_userRecord == null)
+            var UserRole = CheckUser();
+            if (UserRole == 2)
             {
-                var _logedinUser = new LogedinUser()
+                var _day = DateTime.Now;
+                var _strDay = _day.ToString("yyyy-MM-dd");
+                var _Date = Convert.ToDateTime(_strDay);
+                var _userRecord = db.LogedinUsers.SingleOrDefault(U => U.userId == UserId && U.Day == _Date);
+                if (_userRecord == null)
                 {
-                    userId = UserId,
-                    Day = _Date,
-                    CheckInTime = DateTime.Now.ToString("hh:mm tt"),
-                    CheckOutTime = null,
-                    CheckInComment= CheckinComment
-                };
-                db.LogedinUsers.Add(_logedinUser);
-                db.SaveChanges();
-                return new HttpStatusCodeResult(HttpStatusCode.OK);
+                    var _logedinUser = new LogedinUser()
+                    {
+                        userId = UserId,
+                        Day = Convert.ToDateTime(_strDay),
+                        CheckInTime = DateTime.Now.ToString("hh:mm tt"),
+                        CheckOutTime = null,
+                        CheckInComment = CheckinComment
+                    };
+                    db.LogedinUsers.Add(_logedinUser);
+                    db.SaveChanges();
+                    return new HttpStatusCodeResult(HttpStatusCode.OK);
+                }
+                else
+                {
+                    return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+                }
             }
             else
             {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+                return RedirectToAction("Login");
             }
         }
 
         [HttpPost]
         public ActionResult CheckOut(int UserId,string CheckoutComment)
         {
-            var _Date = DateTime.Now.ToString("yyyy-MM-dd");
-            var _userRecord = db.LogedinUsers.SingleOrDefault(U => U.userId == UserId && U.Day == _Date && U.CheckOutTime==null);
-            if (_userRecord == null)
+            var UserRole = CheckUser();
+            if (UserRole == 2)
             {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+                var _day = DateTime.Now;
+                var _strDay = _day.ToString("yyyy-MM-dd");
+                var _Date = Convert.ToDateTime(_strDay);
+                var _userRecord = db.LogedinUsers.SingleOrDefault(U => U.userId == UserId && U.Day == _Date && U.CheckOutTime == null);
+                if (_userRecord == null)
+                {
+                    return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+                }
+                else
+                {
+                    _userRecord.CheckOutTime = DateTime.Now.ToString("hh:mm tt");
+                    _userRecord.CheckOutComment = CheckoutComment;
+                    db.SaveChanges();
+                    return new HttpStatusCodeResult(HttpStatusCode.OK);
+                }
             }
             else
             {
-                _userRecord.CheckOutTime = DateTime.Now.ToString("hh:mm tt");
-                _userRecord.CheckOutComment = CheckoutComment;
-                db.SaveChanges();
-                return new HttpStatusCodeResult(HttpStatusCode.OK);
+                return RedirectToAction("Login");
             }
         }
         public ActionResult LogOut()
         {
             Session.Clear();
-            //Report();
             return RedirectToAction("Login");
         }
         [HttpGet]
@@ -296,12 +315,25 @@ namespace SaudisoftTask.Areas.UserRole.Controllers
             var UserRole = CheckUser();
             if (UserRole == 1&&_report.Report.DateFrom !=null && _report.Report.DateTo != null)
             {
+
+                var _FDate = Convert.ToDateTime(_report.Report.DateFrom);
+                var _fDateFormat = _FDate.ToString("yyyy-MM-dd");
+                DateTime FDate = Convert.ToDateTime(_fDateFormat);
+
+                var _TDate = Convert.ToDateTime(_report.Report.DateTo);
+                var _tDateFormat = _TDate.ToString("yyyy-MM-dd");
+                DateTime TDate = Convert.ToDateTime(_tDateFormat);
+                int diffBetweenTwoDates =0;
+                if(TDate> FDate || TDate== FDate)
+                {
+                     diffBetweenTwoDates =Convert.ToInt32( (TDate - FDate).TotalDays);
+                }
                 var Delay = (from r in db.LogedinUsers
                              where DbFunctions.CreateTime(SqlFunctions.DatePart("hh", r.CheckInTime),
                                    SqlFunctions.DatePart("mi", r.CheckInTime),
                                    SqlFunctions.DatePart("ss", r.CheckInTime)) > DbFunctions.CreateTime(SqlFunctions.DatePart("hh", r.user.CheckInTime),
                                    SqlFunctions.DatePart("mi", r.user.CheckInTime),
-                                   SqlFunctions.DatePart("ss", r.user.CheckInTime))
+                                   SqlFunctions.DatePart("ss", r.user.CheckInTime)) && r.Day >= FDate && r.Day <= TDate
                              group r by r.user.Name into g
                              select new
                              {
@@ -311,6 +343,7 @@ namespace SaudisoftTask.Areas.UserRole.Controllers
                              }).ToList();
 
                 var Attendance = db.LogedinUsers
+                    .Where(r => r.Day >= FDate && r.Day <= TDate)
                   .Select(z => new { z.user.Name, z.Day })
                   .GroupBy(x => new { x.Name })
                   .Select(g => new
@@ -326,7 +359,7 @@ namespace SaudisoftTask.Areas.UserRole.Controllers
                 {
                     Name = g.Key,
                     Del = g.Sum(x => x.delay),
-                    Attendance = g.Sum(x => x.attendance)
+                    Attendance = diffBetweenTwoDates+1 - g.Sum(x => x.attendance)
                 }).ToList();
 
                 var ReportVM = new ReportVM
